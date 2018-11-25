@@ -2,15 +2,14 @@ const axios = require('axios');
 const getToken = require('./validate');
 
 //Constants
-const key = getToken();
+const tokenPromise = getToken();
 let currentArtistId = -1;
 //TEMP. Add a Spotify song URL here to test
 let currentTrackId = '6YX4TgG7dOFC931bICwE3O';
 let topTracks = [];
 
-//Querying
 async function searchArtistOrSong(query, type) {
-  const token = (await key).data.access_token;
+  const token = (await tokenPromise).data.access_token;
   try {
     const result = await axios({
       method: 'get',
@@ -33,7 +32,7 @@ async function searchArtistOrSong(query, type) {
   }
 }
 async function findRelatedArtists(artistId) {
-  const token = (await key).data.access_token;
+  const token = (await tokenPromise).data.access_token;
   try {
     const result = await axios({
       method: 'get',
@@ -48,7 +47,7 @@ async function findRelatedArtists(artistId) {
 }
 //Get an artist's top tracks and return the track most similar to the one stored in 'currentTrackId'
 async function findBestTrack(artistId) {
-  const token = (await key).data.access_token;
+  const token = (await tokenPromise).data.access_token;
   try {
     const topTracksResult = await axios({
       method: 'get',
@@ -81,7 +80,7 @@ async function findBestTrack(artistId) {
 
 //Returns a 'score' for track 2's similarity to track 1, lower is better
 async function compareTracks(track1Id, track2Id) {
-  const token = (await key).data.access_token;
+  const token = (await tokenPromise).data.access_token;
   try {
     const tracksFeatures = await axios({
       method: 'get',
@@ -102,4 +101,12 @@ async function compareTracks(track1Id, track2Id) {
 }
 
 //Enter an artist name here to search it, find it's best songs and compare those songs to the one stored in currentSongId
-searchArtistOrSong('queens of the stone age', 'artist');
+// searchArtistOrSong('queens of the stone age', 'artist');
+
+module.exports = {
+  tokenPromise,
+  searchArtistOrSong,
+  findRelatedArtists,
+  findBestTrack,
+  compareTracks,
+};
