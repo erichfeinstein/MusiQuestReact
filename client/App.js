@@ -40,7 +40,13 @@ export default class App extends React.Component {
                   key={artist.id}
                   onClick={() => this.selectArtist(artist)}
                 >
-                  <img src={artist.images[0] ? artist.images[0].url : ''} />
+                  <img
+                    src={
+                      artist.images[0]
+                        ? artist.images[0].url
+                        : 'http://res.cloudinary.com/dn1agy1ea/image/upload/v1495644755/empty-album-cover_wvtnrn.png'
+                    }
+                  />
                   <div>{artist.name}</div>
                 </div>
               );

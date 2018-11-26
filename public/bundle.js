@@ -185,7 +185,9 @@ var App = function (_React$Component) {
                     return _this2.selectArtist(artist);
                   }
                 },
-                _react2.default.createElement('img', { src: artist.images[0] ? artist.images[0].url : '' }),
+                _react2.default.createElement('img', {
+                  src: artist.images[0] ? artist.images[0].url : 'http://res.cloudinary.com/dn1agy1ea/image/upload/v1495644755/empty-album-cover_wvtnrn.png'
+                }),
                 _react2.default.createElement(
                   'div',
                   null,
