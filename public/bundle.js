@@ -128,9 +128,17 @@ var App = function (_React$Component) {
 
     var _this = _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).call(this));
 
+    _this.state = {
+      currentSong: {},
+      currentArtist: {},
+      artists: []
+    };
     _this.searchArtist = _this.searchArtist.bind(_this);
+    _this.selectArtist = _this.selectArtist.bind(_this);
     return _this;
   }
+
+  //Mindset: User is prompted to search an artist, confirm the artist, then search the song they want to find similar songs to
 
   _createClass(App, [{
     key: 'render',
@@ -155,46 +163,111 @@ var App = function (_React$Component) {
             }
           },
           'Search!'
+        ),
+        _react2.default.createElement(
+          'div',
+          null,
+          _react2.default.createElement(
+            'ul',
+            null,
+            this.state.artists.map(function (artist) {
+              return _react2.default.createElement(
+                'div',
+                {
+                  className: 'artist',
+                  key: artist.id,
+                  onClick: function onClick() {
+                    return _this2.selectArtist(artist);
+                  }
+                },
+                _react2.default.createElement('img', { src: artist.images[0] ? artist.images[0].url : '' }),
+                _react2.default.createElement(
+                  'div',
+                  null,
+                  artist.name
+                )
+              );
+            })
+          )
         )
       );
     }
+
+    //Local functions
+
   }, {
-    key: 'searchArtist',
+    key: 'selectArtist',
     value: function () {
-      var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
-        var query, result;
+      var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(artist) {
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                _context.prev = 0;
-                query = document.getElementById('search-input').value;
-                _context.next = 4;
-                return _axios2.default.get('/api/search-artist?artist=' + query);
+                _context.next = 2;
+                return this.setState({
+                  currentArtist: artist
+                });
 
-              case 4:
-                result = _context.sent;
+              case 2:
+                console.log('you selected', this.state.currentArtist);
 
-                console.log(result.data.artists.items[0].name);
-                _context.next = 11;
-                break;
-
-              case 8:
-                _context.prev = 8;
-                _context.t0 = _context['catch'](0);
-
-                console.error(_context.t0);
-
-              case 11:
+              case 3:
               case 'end':
                 return _context.stop();
             }
           }
-        }, _callee, this, [[0, 8]]);
+        }, _callee, this);
+      }));
+
+      function selectArtist(_x) {
+        return _ref.apply(this, arguments);
+      }
+
+      return selectArtist;
+    }()
+
+    //Axios functions
+
+  }, {
+    key: 'searchArtist',
+    value: function () {
+      var _ref2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
+        var query, result;
+        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                _context2.prev = 0;
+                query = document.getElementById('search-input').value;
+                _context2.next = 4;
+                return _axios2.default.get('/api/search-artist?artist=' + query);
+
+              case 4:
+                result = _context2.sent;
+
+                this.setState({
+                  artists: result.data.artists.items
+                });
+                _context2.next = 12;
+                break;
+
+              case 8:
+                _context2.prev = 8;
+                _context2.t0 = _context2['catch'](0);
+
+                console.log('problem finding artist');
+                console.error(_context2.t0);
+
+              case 12:
+              case 'end':
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this, [[0, 8]]);
       }));
 
       function searchArtist() {
-        return _ref.apply(this, arguments);
+        return _ref2.apply(this, arguments);
       }
 
       return searchArtist;

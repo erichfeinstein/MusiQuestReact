@@ -13,18 +13,18 @@ async function searchArtistOrSong(query, type) {
   try {
     const result = await axios({
       method: 'get',
-      url: `https://api.spotify.com/v1/search?q=${query}&type=${type}`,
+      url: `https://api.spotify.com/v1/search?q=${query}&type=artist,track`,
       headers: { Authorization: `Bearer ${token}` },
     });
 
-    //Handle result for type
-    if (type === 'artist') {
-      //Add ability to move through artists if top result was not accurate
-      currentArtistId = result.data.artists.items[0].id;
+    // //Handle result for type
+    // if (type === 'artist') {
+    //   //Add ability to move through artists if top result was not accurate
+    //   currentArtistId = result.data.artists.items[0].id;
 
-      //TEMP, this function will be called elsewhere
-      findBestTrack(currentArtistId);
-    }
+    //   //TEMP, this function will be called elsewhere
+    //   findBestTrack(currentArtistId);
+    // }
     //Handle result in context of function call
     return result.data;
   } catch (err) {

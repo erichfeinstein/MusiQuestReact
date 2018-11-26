@@ -1,0 +1,11 @@
+.artist {
+  /* background-color: red; */
+  display: inline-block;
+  text-align: center;
+}
+.artist img {
+  display: block;
+  max-width: 250px;
+  height: auto;
+  width: auto;
+}
