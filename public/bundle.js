@@ -150,19 +150,24 @@ var App = function (_React$Component) {
         null,
         _react2.default.createElement(
           'div',
-          null,
-          'Welcome'
+          { id: 'header' },
+          'Welcome to MusiQuest'
         ),
-        _react2.default.createElement('input', { id: 'search-input', placeholder: 'Search artists' }),
         _react2.default.createElement(
-          'button',
-          {
-            type: 'submit',
-            onClick: function onClick() {
-              _this2.searchArtist();
-            }
-          },
-          'Search!'
+          'div',
+          { id: 'search-area' },
+          _react2.default.createElement('input', { id: 'search-input', placeholder: 'Search artists' }),
+          _react2.default.createElement(
+            'button',
+            {
+              id: 'search-button',
+              type: 'submit',
+              onClick: function onClick() {
+                _this2.searchArtist();
+              }
+            },
+            'Search!'
+          )
         ),
         _react2.default.createElement(
           'div',

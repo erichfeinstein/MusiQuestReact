@@ -18,16 +18,19 @@ export default class App extends React.Component {
   render() {
     return (
       <div>
-        <div>Welcome</div>
-        <input id="search-input" placeholder="Search artists" />
-        <button
-          type="submit"
-          onClick={() => {
-            this.searchArtist();
-          }}
-        >
-          Search!
-        </button>
+        <div id="header">Welcome to MusiQuest</div>
+        <div id="search-area">
+          <input id="search-input" placeholder="Search artists" />
+          <button
+            id="search-button"
+            type="submit"
+            onClick={() => {
+              this.searchArtist();
+            }}
+          >
+            Search!
+          </button>
+        </div>
         <div>
           <ul>
             {this.state.artists.map(artist => {

@@ -1,3 +1,9 @@
+body {
+  display: flex;
+  justify-content: center;
+  background-color: #222222;
+}
+
 .artist {
   /* background-color: red; */
   display: inline-block;
@@ -8,4 +14,34 @@
   max-width: 250px;
   height: auto;
   width: auto;
+}
+
+#header {
+  padding: 2em;
+  font-size: 3em;
+  color: white;
+}
+
+#search-area {
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+}
+#search-area input {
+  margin-right: 10px;
+  padding: 1em;
+  width: 85%;
+  border-radius: 20px;
+}
+#search-area button {
+  padding: 1em;
+  width: 15%;
+  border-radius: 20px;
+  transition: background-color, 0.15s;
+}
+#search-area button:hover {
+  padding: 1em;
+  width: 15%;
+  border-radius: 20px;
+  background-color: lightgrey;
 }
