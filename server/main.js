@@ -26,6 +26,9 @@ app.get('/api/:artistId/top-tracks', async function(req, res, next) {
 });
 
 //Will we need to pass the visisted tracks here?
+//I think this may call for a DB
+//User hasMany Artists (that they've already discovered)
+//Artists belongsToMany User (who have discovered them)
 app.get('/api/:artistId/:trackId/new-track', async function(req, res, next) {
   //related artists -> best tracks (or maybe all tracks) -> compare tracks
   const relatedArtists = await queries.findRelatedArtists(req.params.artistId);

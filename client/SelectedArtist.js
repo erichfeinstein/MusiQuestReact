@@ -1,6 +1,10 @@
 import React from 'react';
 import axios from 'axios';
 
+//3 options after being shown a new artist/song:
+//I like this song, more by this artist
+//Not a fan, find a different artist from previous artist's related artists
+//I like this band, show me this band's related artists
 export default class SelectedArtist extends React.Component {
   constructor() {
     super();
@@ -27,11 +31,11 @@ export default class SelectedArtist extends React.Component {
 
   render() {
     return (
-      <div>
+      <div id="selected-artist">
         <div>
           {this.state.selectedTrack.id
             ? this.state.selectedTrack.name
-            : 'nothing yet'}
+            : 'Choose a song'}
         </div>
         <img
           src={
@@ -40,8 +44,8 @@ export default class SelectedArtist extends React.Component {
               : 'http://media.virbcdn.com/cdn_images/crop_300x300/cd/default_song_album.jpg'
           }
         />
-        <div>{this.state.artist.name}</div>
-        <ol>
+        <div>Popular songs by {this.state.artist.name}</div>
+        <ul>
           {this.state.topTracks.map(track => {
             return (
               <li
@@ -55,7 +59,7 @@ export default class SelectedArtist extends React.Component {
               </li>
             );
           })}
-        </ol>
+        </ul>
       </div>
     );
   }

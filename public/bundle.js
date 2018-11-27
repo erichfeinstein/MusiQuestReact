@@ -388,6 +388,10 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+//3 options after being shown a new artist/song:
+//I like this song, more by this artist
+//Not a fan, find a different artist from previous artist's related artists
+//I like this band, show me this band's related artists
 var SelectedArtist = function (_React$Component) {
   _inherits(SelectedArtist, _React$Component);
 
@@ -452,11 +456,11 @@ var SelectedArtist = function (_React$Component) {
 
       return _react2.default.createElement(
         'div',
-        null,
+        { id: 'selected-artist' },
         _react2.default.createElement(
           'div',
           null,
-          this.state.selectedTrack.id ? this.state.selectedTrack.name : 'nothing yet'
+          this.state.selectedTrack.id ? this.state.selectedTrack.name : 'Choose a song'
         ),
         _react2.default.createElement('img', {
           src: this.state.artist.images ? this.state.artist.images[0].url : 'http://media.virbcdn.com/cdn_images/crop_300x300/cd/default_song_album.jpg'
@@ -464,10 +468,11 @@ var SelectedArtist = function (_React$Component) {
         _react2.default.createElement(
           'div',
           null,
+          'Popular songs by ',
           this.state.artist.name
         ),
         _react2.default.createElement(
-          'ol',
+          'ul',
           null,
           this.state.topTracks.map(function (track) {
             return _react2.default.createElement(
