@@ -82,16 +82,17 @@ body {
 }
 
 #selected-artist {
+  color: white;
+  padding: 2em;
   display: flex;
   justify-content: center;
+  align-items: center;
   flex-direction: column;
   text-align: center;
-  background-color: red;
 }
 #selected-artist img {
   margin: 0;
-  /* display: flex; */
-  /* justify-content: center; */
+  border-radius: 20px;
   width: 20vw;
   height: 20vw;
 }

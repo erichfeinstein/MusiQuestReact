@@ -57,13 +57,6 @@ export default class App extends React.Component {
       const result = await axios.get(
         `/api/${this.state.currentArtist.id}/related-artists`
       );
-      console.log('you selected', this.state.currentArtist);
-      console.log(
-        'related artists, ',
-        result.data.artists.map(function(artist) {
-          return artist.name;
-        })
-      );
     } catch (err) {
       console.error(err);
     }

@@ -210,26 +210,21 @@ var App = function (_React$Component) {
 
               case 5:
                 result = _context.sent;
-
-                console.log('you selected', this.state.currentArtist);
-                console.log('related artists, ', result.data.artists.map(function (artist) {
-                  return artist.name;
-                }));
-                _context.next = 13;
+                _context.next = 11;
                 break;
 
-              case 10:
-                _context.prev = 10;
+              case 8:
+                _context.prev = 8;
                 _context.t0 = _context['catch'](2);
 
                 console.error(_context.t0);
 
-              case 13:
+              case 11:
               case 'end':
                 return _context.stop();
             }
           }
-        }, _callee, this, [[2, 10]]);
+        }, _callee, this, [[2, 8]]);
       }));
 
       function selectArtist(_x) {
@@ -462,6 +457,7 @@ var SelectedArtist = function (_React$Component) {
           null,
           this.state.selectedTrack.id ? this.state.selectedTrack.name : 'Choose a song'
         ),
+        this.state.selectedTrack.album && _react2.default.createElement('img', { src: this.state.selectedTrack.album.images[0].url }),
         _react2.default.createElement('img', {
           src: this.state.artist.images ? this.state.artist.images[0].url : 'http://media.virbcdn.com/cdn_images/crop_300x300/cd/default_song_album.jpg'
         }),
@@ -487,10 +483,6 @@ var SelectedArtist = function (_React$Component) {
                           return _this2.selectTrack(track);
 
                         case 2:
-                          _context2.next = 4;
-                          return _this2.findNewTrack();
-
-                        case 4:
                         case 'end':
                           return _context2.stop();
                       }
@@ -507,28 +499,21 @@ var SelectedArtist = function (_React$Component) {
     }
   }, {
     key: 'selectTrack',
-    value: function selectTrack(track) {
-      this.setState({
-        selectedTrack: track
-      });
-    }
-  }, {
-    key: 'findNewTrack',
     value: function () {
-      var _ref3 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3() {
-        var result;
+      var _ref3 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(track) {
+        var trackInfo;
         return regeneratorRuntime.wrap(function _callee3$(_context3) {
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
                 _context3.next = 2;
-                return _axios2.default.get('/api/' + this.state.artist.id + '/' + this.state.selectedTrack.id + '/new-track');
+                return _axios2.default.get('/api/tracks/' + track.id);
 
               case 2:
-                result = _context3.sent;
+                trackInfo = _context3.sent;
 
                 this.setState({
-                  selectedTrack: result.data
+                  selectedTrack: trackInfo.data
                 });
                 console.log(this.state.selectedTrack);
 
@@ -540,8 +525,41 @@ var SelectedArtist = function (_React$Component) {
         }, _callee3, this);
       }));
 
-      function findNewTrack() {
+      function selectTrack(_x) {
         return _ref3.apply(this, arguments);
+      }
+
+      return selectTrack;
+    }()
+  }, {
+    key: 'findNewTrack',
+    value: function () {
+      var _ref4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4() {
+        var result;
+        return regeneratorRuntime.wrap(function _callee4$(_context4) {
+          while (1) {
+            switch (_context4.prev = _context4.next) {
+              case 0:
+                _context4.next = 2;
+                return _axios2.default.get('/api/' + this.state.artist.id + '/' + this.state.selectedTrack.id + '/new-track');
+
+              case 2:
+                result = _context4.sent;
+
+                this.setState({
+                  selectedTrack: result.data
+                });
+
+              case 4:
+              case 'end':
+                return _context4.stop();
+            }
+          }
+        }, _callee4, this);
+      }));
+
+      function findNewTrack() {
+        return _ref4.apply(this, arguments);
       }
 
       return findNewTrack;

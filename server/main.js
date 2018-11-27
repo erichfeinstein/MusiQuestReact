@@ -10,6 +10,11 @@ app.get('/', function(req, res, next) {
   res.sendFile(path.join(__dirname, '..', '/client/index.html'));
 });
 
+app.get('/api/tracks/:trackId', async function(req, res, next) {
+  const result = await queries.findTrackInfo(req.params.trackId);
+  res.json(result);
+});
+
 app.get('/api/search-artist', async function(req, res, next) {
   const result = await queries.searchArtistOrSong(req.query.artist, 'artist');
   res.json(result);

@@ -18,6 +18,19 @@ async function searchArtistOrSong(query) {
     console.error(err);
   }
 }
+async function findTrackInfo(trackId) {
+  const token = (await tokenPromise).data.access_token;
+  try {
+    const result = await axios({
+      method: 'get',
+      url: `https://api.spotify.com/v1/tracks/${trackId}`,
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return result.data;
+  } catch (err) {
+    console.error(err);
+  }
+}
 async function findRelatedArtists(artistId) {
   const token = (await tokenPromise).data.access_token;
   try {
@@ -101,6 +114,7 @@ async function bestTrackFromList(trackId, otherTracks) {
 module.exports = {
   tokenPromise,
   searchArtistOrSong,
+  findTrackInfo,
   findRelatedArtists,
   findBestTracks,
   compareTracks,

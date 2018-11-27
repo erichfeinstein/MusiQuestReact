@@ -37,6 +37,10 @@ export default class SelectedArtist extends React.Component {
             ? this.state.selectedTrack.name
             : 'Choose a song'}
         </div>
+        {/* MusiQuest component */}
+        {this.state.selectedTrack.album && (
+          <img src={this.state.selectedTrack.album.images[0].url} />
+        )}
         <img
           src={
             this.state.artist.images
@@ -51,7 +55,7 @@ export default class SelectedArtist extends React.Component {
               <li
                 onClick={async () => {
                   await this.selectTrack(track);
-                  await this.findNewTrack();
+                  // await this.findNewTrack();
                 }}
                 key={track.id}
               >
@@ -64,10 +68,12 @@ export default class SelectedArtist extends React.Component {
     );
   }
 
-  selectTrack(track) {
+  async selectTrack(track) {
+    const trackInfo = await axios.get(`/api/tracks/${track.id}`);
     this.setState({
-      selectedTrack: track,
+      selectedTrack: trackInfo.data,
     });
+    console.log(this.state.selectedTrack);
   }
   async findNewTrack() {
     const result = await axios.get(
@@ -76,6 +82,5 @@ export default class SelectedArtist extends React.Component {
     this.setState({
       selectedTrack: result.data,
     });
-    console.log(this.state.selectedTrack);
   }
 }
