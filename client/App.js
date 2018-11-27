@@ -1,5 +1,8 @@
 import React from 'react';
 import axios from 'axios';
+//Components
+import ArtistList from './ArtistList';
+import SelectedArtist from './SelectedArtist';
 
 export default class App extends React.Component {
   constructor() {
@@ -18,7 +21,7 @@ export default class App extends React.Component {
   render() {
     return (
       <div>
-        <div id="header">Welcome to MusiQuest</div>
+        <div id="header">MusiQuest</div>
         <div id="search-area">
           <input id="search-input" placeholder="Search artists" />
           <button
@@ -31,28 +34,15 @@ export default class App extends React.Component {
             Search!
           </button>
         </div>
-        <div>
-          <ul>
-            {this.state.artists.map(artist => {
-              return (
-                <div
-                  className="artist"
-                  key={artist.id}
-                  onClick={() => this.selectArtist(artist)}
-                >
-                  <img
-                    src={
-                      artist.images[0]
-                        ? artist.images[0].url
-                        : 'http://res.cloudinary.com/dn1agy1ea/image/upload/v1495644755/empty-album-cover_wvtnrn.png'
-                    }
-                  />
-                  <div>{artist.name}</div>
-                </div>
-              );
-            })}
-          </ul>
-        </div>
+        {/* Selected Artist Display */}
+        {this.state.currentArtist.id ? (
+          <SelectedArtist artist={this.state.currentArtist} />
+        ) : (
+          <ArtistList
+            artists={this.state.artists}
+            selectArtist={this.selectArtist}
+          />
+        )}
       </div>
     );
   }
@@ -60,13 +50,30 @@ export default class App extends React.Component {
   //Local functions
   async selectArtist(artist) {
     await this.setState({
+      artists: [],
       currentArtist: artist,
     });
-    console.log('you selected', this.state.currentArtist);
+    try {
+      const result = await axios.get(
+        `/api/${this.state.currentArtist.id}/related-artists`
+      );
+      console.log('you selected', this.state.currentArtist);
+      console.log(
+        'related artists, ',
+        result.data.artists.map(function(artist) {
+          return artist.name;
+        })
+      );
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   //Axios functions
   async searchArtist() {
+    this.setState({
+      currentArtist: {},
+    });
     try {
       const query = document.getElementById('search-input').value;
       const result = await axios.get(`/api/search-artist?artist=${query}`);

@@ -110,6 +110,14 @@ var _axios = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 
 var _axios2 = _interopRequireDefault(_axios);
 
+var _ArtistList = __webpack_require__(/*! ./ArtistList */ "./client/ArtistList.js");
+
+var _ArtistList2 = _interopRequireDefault(_ArtistList);
+
+var _SelectedArtist = __webpack_require__(/*! ./SelectedArtist */ "./client/SelectedArtist.js");
+
+var _SelectedArtist2 = _interopRequireDefault(_SelectedArtist);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
@@ -119,6 +127,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+//Components
+
 
 var App = function (_React$Component) {
   _inherits(App, _React$Component);
@@ -151,7 +161,7 @@ var App = function (_React$Component) {
         _react2.default.createElement(
           'div',
           { id: 'header' },
-          'Welcome to MusiQuest'
+          'MusiQuest'
         ),
         _react2.default.createElement(
           'div',
@@ -169,34 +179,10 @@ var App = function (_React$Component) {
             'Search!'
           )
         ),
-        _react2.default.createElement(
-          'div',
-          null,
-          _react2.default.createElement(
-            'ul',
-            null,
-            this.state.artists.map(function (artist) {
-              return _react2.default.createElement(
-                'div',
-                {
-                  className: 'artist',
-                  key: artist.id,
-                  onClick: function onClick() {
-                    return _this2.selectArtist(artist);
-                  }
-                },
-                _react2.default.createElement('img', {
-                  src: artist.images[0] ? artist.images[0].url : 'http://res.cloudinary.com/dn1agy1ea/image/upload/v1495644755/empty-album-cover_wvtnrn.png'
-                }),
-                _react2.default.createElement(
-                  'div',
-                  null,
-                  artist.name
-                )
-              );
-            })
-          )
-        )
+        this.state.currentArtist.id ? _react2.default.createElement(_SelectedArtist2.default, { artist: this.state.currentArtist }) : _react2.default.createElement(_ArtistList2.default, {
+          artists: this.state.artists,
+          selectArtist: this.selectArtist
+        })
       );
     }
 
@@ -206,24 +192,44 @@ var App = function (_React$Component) {
     key: 'selectArtist',
     value: function () {
       var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(artist) {
+        var result;
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
                 _context.next = 2;
                 return this.setState({
+                  artists: [],
                   currentArtist: artist
                 });
 
               case 2:
-                console.log('you selected', this.state.currentArtist);
+                _context.prev = 2;
+                _context.next = 5;
+                return _axios2.default.get('/api/' + this.state.currentArtist.id + '/related-artists');
 
-              case 3:
+              case 5:
+                result = _context.sent;
+
+                console.log('you selected', this.state.currentArtist);
+                console.log('related artists, ', result.data.artists.map(function (artist) {
+                  return artist.name;
+                }));
+                _context.next = 13;
+                break;
+
+              case 10:
+                _context.prev = 10;
+                _context.t0 = _context['catch'](2);
+
+                console.error(_context.t0);
+
+              case 13:
               case 'end':
                 return _context.stop();
             }
           }
-        }, _callee, this);
+        }, _callee, this, [[2, 10]]);
       }));
 
       function selectArtist(_x) {
@@ -244,33 +250,36 @@ var App = function (_React$Component) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                _context2.prev = 0;
+                this.setState({
+                  currentArtist: {}
+                });
+                _context2.prev = 1;
                 query = document.getElementById('search-input').value;
-                _context2.next = 4;
+                _context2.next = 5;
                 return _axios2.default.get('/api/search-artist?artist=' + query);
 
-              case 4:
+              case 5:
                 result = _context2.sent;
 
                 this.setState({
                   artists: result.data.artists.items
                 });
-                _context2.next = 12;
+                _context2.next = 13;
                 break;
 
-              case 8:
-                _context2.prev = 8;
-                _context2.t0 = _context2['catch'](0);
+              case 9:
+                _context2.prev = 9;
+                _context2.t0 = _context2['catch'](1);
 
                 console.log('problem finding artist');
                 console.error(_context2.t0);
 
-              case 12:
+              case 13:
               case 'end':
                 return _context2.stop();
             }
           }
-        }, _callee2, this, [[0, 8]]);
+        }, _callee2, this, [[1, 9]]);
       }));
 
       function searchArtist() {
@@ -285,6 +294,259 @@ var App = function (_React$Component) {
 }(_react2.default.Component);
 
 exports.default = App;
+
+/***/ }),
+
+/***/ "./client/ArtistList.js":
+/*!******************************!*\
+  !*** ./client/ArtistList.js ***!
+  \******************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _react = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var ArtistList = function ArtistList(props) {
+  var artists = props.artists;
+  var selectArtist = props.selectArtist;
+  return _react2.default.createElement(
+    "div",
+    null,
+    _react2.default.createElement(
+      "ul",
+      { id: "artist-list" },
+      artists.map(function (artist) {
+        return _react2.default.createElement(
+          "div",
+          {
+            className: "artist",
+            key: artist.id,
+            onClick: function onClick() {
+              return selectArtist(artist);
+            }
+          },
+          _react2.default.createElement("img", {
+            src: artist.images[0] ? artist.images[0].url : 'http://media.virbcdn.com/cdn_images/crop_300x300/cd/default_song_album.jpg'
+          }),
+          _react2.default.createElement(
+            "div",
+            null,
+            artist.name
+          )
+        );
+      })
+    )
+  );
+};
+
+exports.default = ArtistList;
+
+/***/ }),
+
+/***/ "./client/SelectedArtist.js":
+/*!**********************************!*\
+  !*** ./client/SelectedArtist.js ***!
+  \**********************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+
+var _react2 = _interopRequireDefault(_react);
+
+var _axios = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
+
+var _axios2 = _interopRequireDefault(_axios);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var SelectedArtist = function (_React$Component) {
+  _inherits(SelectedArtist, _React$Component);
+
+  function SelectedArtist() {
+    _classCallCheck(this, SelectedArtist);
+
+    var _this = _possibleConstructorReturn(this, (SelectedArtist.__proto__ || Object.getPrototypeOf(SelectedArtist)).call(this));
+
+    _this.state = {
+      topTracks: [],
+      artist: {},
+      selectedTrack: {}
+    };
+    _this.findNewTrack = _this.findNewTrack.bind(_this);
+    _this.selectTrack = _this.selectTrack.bind(_this);
+    return _this;
+  }
+
+  _createClass(SelectedArtist, [{
+    key: 'componentDidMount',
+    value: function () {
+      var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
+        var topTracks;
+        return regeneratorRuntime.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                _context.next = 2;
+                return this.setState({
+                  artist: this.props.artist
+                });
+
+              case 2:
+                _context.next = 4;
+                return _axios2.default.get('/api/' + this.state.artist.id + '/top-tracks');
+
+              case 4:
+                topTracks = _context.sent;
+
+                this.setState({
+                  topTracks: topTracks.data
+                });
+
+              case 6:
+              case 'end':
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      function componentDidMount() {
+        return _ref.apply(this, arguments);
+      }
+
+      return componentDidMount;
+    }()
+  }, {
+    key: 'render',
+    value: function render() {
+      var _this2 = this;
+
+      return _react2.default.createElement(
+        'div',
+        null,
+        _react2.default.createElement(
+          'div',
+          null,
+          this.state.selectedTrack.id ? this.state.selectedTrack.name : 'nothing yet'
+        ),
+        _react2.default.createElement('img', {
+          src: this.state.artist.images ? this.state.artist.images[0].url : 'http://media.virbcdn.com/cdn_images/crop_300x300/cd/default_song_album.jpg'
+        }),
+        _react2.default.createElement(
+          'div',
+          null,
+          this.state.artist.name
+        ),
+        _react2.default.createElement(
+          'ol',
+          null,
+          this.state.topTracks.map(function (track) {
+            return _react2.default.createElement(
+              'li',
+              {
+                onClick: _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
+                  return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                    while (1) {
+                      switch (_context2.prev = _context2.next) {
+                        case 0:
+                          _context2.next = 2;
+                          return _this2.selectTrack(track);
+
+                        case 2:
+                          _context2.next = 4;
+                          return _this2.findNewTrack();
+
+                        case 4:
+                        case 'end':
+                          return _context2.stop();
+                      }
+                    }
+                  }, _callee2, _this2);
+                })),
+                key: track.id
+              },
+              track.name
+            );
+          })
+        )
+      );
+    }
+  }, {
+    key: 'selectTrack',
+    value: function selectTrack(track) {
+      this.setState({
+        selectedTrack: track
+      });
+    }
+  }, {
+    key: 'findNewTrack',
+    value: function () {
+      var _ref3 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3() {
+        var result;
+        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                _context3.next = 2;
+                return _axios2.default.get('/api/' + this.state.artist.id + '/' + this.state.selectedTrack.id + '/new-track');
+
+              case 2:
+                result = _context3.sent;
+
+                this.setState({
+                  selectedTrack: result.data
+                });
+                console.log(this.state.selectedTrack);
+
+              case 5:
+              case 'end':
+                return _context3.stop();
+            }
+          }
+        }, _callee3, this);
+      }));
+
+      function findNewTrack() {
+        return _ref3.apply(this, arguments);
+      }
+
+      return findNewTrack;
+    }()
+  }]);
+
+  return SelectedArtist;
+}(_react2.default.Component);
+
+exports.default = SelectedArtist;
 
 /***/ }),
 

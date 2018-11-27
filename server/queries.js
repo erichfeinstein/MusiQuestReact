@@ -3,12 +3,8 @@ const getToken = require('./validate');
 
 //Constants
 const tokenPromise = getToken();
-let currentArtistId = -1;
-//TEMP. Add a Spotify song URL here to test
-let currentTrackId = '6YX4TgG7dOFC931bICwE3O';
-let topTracks = [];
 
-async function searchArtistOrSong(query, type) {
+async function searchArtistOrSong(query) {
   const token = (await tokenPromise).data.access_token;
   try {
     const result = await axios({
@@ -17,15 +13,6 @@ async function searchArtistOrSong(query, type) {
       headers: { Authorization: `Bearer ${token}` },
     });
 
-    // //Handle result for type
-    // if (type === 'artist') {
-    //   //Add ability to move through artists if top result was not accurate
-    //   currentArtistId = result.data.artists.items[0].id;
-
-    //   //TEMP, this function will be called elsewhere
-    //   findBestTrack(currentArtistId);
-    // }
-    //Handle result in context of function call
     return result.data;
   } catch (err) {
     console.error(err);
@@ -46,7 +33,7 @@ async function findRelatedArtists(artistId) {
   }
 }
 //Get an artist's top tracks and return the track most similar to the one stored in 'currentTrackId'
-async function findBestTrack(artistId) {
+async function findBestTracks(artistId) {
   const token = (await tokenPromise).data.access_token;
   try {
     const topTracksResult = await axios({
@@ -55,28 +42,21 @@ async function findBestTrack(artistId) {
       headers: { Authorization: `Bearer ${token}` },
     });
     //Find top tracks to compare
-    topTracks = topTracksResult.data.tracks.map(function(track) {
+    const topTracks = topTracksResult.data.tracks.map(function(track) {
       return {
         name: track.name,
         id: track.id,
       };
     });
-    const trackScores = topTracks.map(function(track) {
-      return compareTracks(currentTrackId, track.id);
-    });
-    let bestScore = await trackScores[0];
-    let bestScoreIndex = 0;
-    for (let i = 1; i < topTracks.length; i++) {
-      if ((await trackScores[i]) < bestScore) {
-        bestScore = await trackScores[i];
-        bestScoreIndex = i;
-      }
-    }
-    console.log('best song match is', topTracks[bestScoreIndex].name);
+
+    return topTracks;
   } catch (err) {
     console.error(err);
   }
 }
+
+//Some other helpful functions to implement
+//getAllTracksByArtist
 
 //Returns a 'score' for track 2's similarity to track 1, lower is better
 async function compareTracks(track1Id, track2Id) {
@@ -99,6 +79,21 @@ async function compareTracks(track1Id, track2Id) {
     console.error(err);
   }
 }
+//Uses compareTracks to find the closest match between source track and track in given list
+async function bestTrackFromList(trackId, otherTracks) {
+  const trackScores = otherTracks.map(function(track) {
+    return compareTracks(trackId, track.id);
+  });
+  let bestScore = await trackScores[0];
+  let bestScoreIndex = 0;
+  for (let i = 1; i < otherTracks.length; i++) {
+    if ((await trackScores[i]) < bestScore) {
+      bestScore = await trackScores[i];
+      bestScoreIndex = i;
+    }
+  }
+  return otherTracks[bestScoreIndex];
+}
 
 //Enter an artist name here to search it, find it's best songs and compare those songs to the one stored in currentSongId
 // searchArtistOrSong('queens of the stone age', 'artist');
@@ -107,6 +102,7 @@ module.exports = {
   tokenPromise,
   searchArtistOrSong,
   findRelatedArtists,
-  findBestTrack,
+  findBestTracks,
   compareTracks,
+  bestTrackFromList,
 };
