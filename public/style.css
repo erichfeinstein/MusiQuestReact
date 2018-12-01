@@ -95,11 +95,16 @@ button {
   border-radius: 20px;
   width: 20vw;
   height: 20vw;
+  object-fit: cover;
 }
 #selected-artist ul {
   list-style: none;
   padding: 0;
   margin: 0;
+}
+.popular-track-li {
+  margin: 1em;
+  cursor: pointer;
 }
 #recommender {
   display: flex;
@@ -111,6 +116,7 @@ button {
 #discovered-img {
   padding: 2em;
 }
+
 .recommend-button {
   color: white;
   margin: 2em;
@@ -119,12 +125,24 @@ button {
 #like-button {
   background-color: #22b210;
 }
+#like-button:disabled {
+  background-color: grey;
+}
 #like-button:hover {
   background-color: #29e212;
+}
+#like-button:disabled:hover {
+  background-color: grey;
 }
 #dislike-button {
   background-color: #bc0707;
 }
+#dislike-button:disabled {
+  background-color: grey;
+}
 #dislike-button:hover {
   background-color: #d80808;
+}
+#dislike-button:disabled:hover {
+  background-color: grey;
 }

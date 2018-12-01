@@ -353,6 +353,8 @@ var _react2 = _interopRequireDefault(_react);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+
 var Recommender = exports.Recommender = function Recommender(props) {
   return _react2.default.createElement(
     "div",
@@ -374,9 +376,25 @@ var Recommender = exports.Recommender = function Recommender(props) {
       {
         className: "recommend-button",
         id: "like-button",
-        onClick: function onClick() {
-          return props.likeTrack();
-        }
+        onClick: _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
+          return regeneratorRuntime.wrap(function _callee$(_context) {
+            while (1) {
+              switch (_context.prev = _context.next) {
+                case 0:
+                  _context.next = 2;
+                  return props.likeTrack();
+
+                case 2:
+                  return _context.abrupt("return", _context.sent);
+
+                case 3:
+                case "end":
+                  return _context.stop();
+              }
+            }
+          }, _callee, undefined);
+        })),
+        disabled: props.outOfSuggestions
       },
       "Like!"
     ),
@@ -385,9 +403,25 @@ var Recommender = exports.Recommender = function Recommender(props) {
       {
         className: "recommend-button",
         id: "dislike-button",
-        onClick: function onClick() {
-          return props.skipTrack();
-        }
+        onClick: _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
+          return regeneratorRuntime.wrap(function _callee2$(_context2) {
+            while (1) {
+              switch (_context2.prev = _context2.next) {
+                case 0:
+                  _context2.next = 2;
+                  return props.skipTrack();
+
+                case 2:
+                  return _context2.abrupt("return", _context2.sent);
+
+                case 3:
+                case "end":
+                  return _context2.stop();
+              }
+            }
+          }, _callee2, undefined);
+        })),
+        disabled: props.outOfSuggestions
       },
       "Dislike"
     )
@@ -450,12 +484,17 @@ var SelectedArtist = function (_React$Component) {
       selectedTrack: {},
       seedArtists: [],
       seedTracks: [],
-      potentialTracks: []
+      potentialTracks: [],
+      outOfSuggestions: false,
+      playing: false,
+      audio: {}
     };
     _this.findNewTracks = _this.findNewTracks.bind(_this);
     _this.selectTrack = _this.selectTrack.bind(_this);
     _this.skipTrack = _this.skipTrack.bind(_this);
     _this.likeTrack = _this.likeTrack.bind(_this);
+    _this.togglePlay = _this.togglePlay.bind(_this);
+    _this.play = _this.play.bind(_this);
     return _this;
   }
 
@@ -470,7 +509,8 @@ var SelectedArtist = function (_React$Component) {
               case 0:
                 _context.next = 2;
                 return this.setState({
-                  selectedArtist: this.props.artist
+                  selectedArtist: this.props.artist,
+                  audio: new Audio()
                 });
 
               case 2:
@@ -499,6 +539,37 @@ var SelectedArtist = function (_React$Component) {
       return componentDidMount;
     }()
   }, {
+    key: 'componentWillUnmount',
+    value: function () {
+      var _ref2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
+        var music;
+        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                music = this.state.audio;
+
+                music.src = '';
+                _context2.next = 4;
+                return this.setState({
+                  audio: {}
+                });
+
+              case 4:
+              case 'end':
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this);
+      }));
+
+      function componentWillUnmount() {
+        return _ref2.apply(this, arguments);
+      }
+
+      return componentWillUnmount;
+    }()
+  }, {
     key: 'render',
     value: function render() {
       var _this2 = this;
@@ -525,24 +596,25 @@ var SelectedArtist = function (_React$Component) {
               return _react2.default.createElement(
                 'li',
                 {
-                  onClick: _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
-                    return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                  className: 'popular-track-li',
+                  onClick: _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3() {
+                    return regeneratorRuntime.wrap(function _callee3$(_context3) {
                       while (1) {
-                        switch (_context2.prev = _context2.next) {
+                        switch (_context3.prev = _context3.next) {
                           case 0:
-                            _context2.next = 2;
+                            _context3.next = 2;
                             return _this2.selectTrack(track);
 
                           case 2:
-                            _context2.next = 4;
+                            _context3.next = 4;
                             return _this2.findNewTracks();
 
                           case 4:
                           case 'end':
-                            return _context2.stop();
+                            return _context3.stop();
                         }
                       }
-                    }, _callee2, _this2);
+                    }, _callee3, _this2);
                   })),
                   key: track.id
                 },
@@ -555,75 +627,40 @@ var SelectedArtist = function (_React$Component) {
           artist: this.state.selectedArtist,
           track: this.state.selectedTrack,
           skipTrack: this.skipTrack,
-          likeTrack: this.likeTrack
+          likeTrack: this.likeTrack,
+          outOfSuggestions: this.state.outOfSuggestions
         })
       );
     }
   }, {
     key: 'selectTrack',
     value: function () {
-      var _ref3 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(track) {
+      var _ref4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(track) {
         var trackInfo, newSeedTracks, newSeedArtists;
-        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+        return regeneratorRuntime.wrap(function _callee4$(_context4) {
           while (1) {
-            switch (_context3.prev = _context3.next) {
+            switch (_context4.prev = _context4.next) {
               case 0:
-                _context3.next = 2;
+                _context4.next = 2;
                 return _axios2.default.get('/api/tracks/' + track.id);
 
               case 2:
-                trackInfo = _context3.sent;
+                trackInfo = _context4.sent;
                 newSeedTracks = this.state.seedTracks;
 
                 newSeedTracks.push(trackInfo.data);
                 newSeedArtists = this.state.seedArtists;
 
                 newSeedArtists.push(trackInfo.data.artists[0]);
-                this.setState({
+                _context4.next = 9;
+                return this.setState({
                   selectedTrack: trackInfo.data,
                   selectedArtist: trackInfo.data.artists[0],
                   seedTracks: newSeedTracks,
                   seedArtists: newSeedArtists
                 });
 
-              case 8:
-              case 'end':
-                return _context3.stop();
-            }
-          }
-        }, _callee3, this);
-      }));
-
-      function selectTrack(_x) {
-        return _ref3.apply(this, arguments);
-      }
-
-      return selectTrack;
-    }()
-  }, {
-    key: 'findNewTracks',
-    value: function () {
-      var _ref4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4() {
-        var result;
-        return regeneratorRuntime.wrap(function _callee4$(_context4) {
-          while (1) {
-            switch (_context4.prev = _context4.next) {
-              case 0:
-                _context4.next = 2;
-                return _axios2.default.get('/api/recommend?artistId=' + this.state.selectedArtist.id + '&trackIds=' + this.state.seedTracks.map(function (track) {
-                  return track.id;
-                }).join('%2C'));
-
-              case 2:
-                result = _context4.sent;
-
-                this.setState({
-                  potentialTracks: result.data.tracks,
-                  selectedTrack: result.data.tracks[0],
-                  selectedArtist: result.data.tracks[0].artists[0]
-                });
-
-              case 4:
+              case 9:
               case 'end':
                 return _context4.stop();
             }
@@ -631,8 +668,52 @@ var SelectedArtist = function (_React$Component) {
         }, _callee4, this);
       }));
 
-      function findNewTracks() {
+      function selectTrack(_x) {
         return _ref4.apply(this, arguments);
+      }
+
+      return selectTrack;
+    }()
+  }, {
+    key: 'findNewTracks',
+    value: function () {
+      var _ref5 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5() {
+        var result, oldAudio;
+        return regeneratorRuntime.wrap(function _callee5$(_context5) {
+          while (1) {
+            switch (_context5.prev = _context5.next) {
+              case 0:
+                _context5.next = 2;
+                return _axios2.default.get('/api/recommend?artistId=' + this.state.selectedArtist.id + '&trackIds=' + this.state.seedTracks.map(function (track) {
+                  return track.id;
+                }).join('%2C'));
+
+              case 2:
+                result = _context5.sent;
+                _context5.next = 5;
+                return this.setState({
+                  potentialTracks: result.data.tracks,
+                  selectedTrack: result.data.tracks[0],
+                  selectedArtist: result.data.tracks[0].artists[0]
+                });
+
+              case 5:
+                oldAudio = this.state.audio;
+
+                oldAudio.src = this.state.selectedTrack.preview_url;
+                _context5.next = 9;
+                return this.play();
+
+              case 9:
+              case 'end':
+                return _context5.stop();
+            }
+          }
+        }, _callee5, this);
+      }));
+
+      function findNewTracks() {
+        return _ref5.apply(this, arguments);
       }
 
       return findNewTracks;
@@ -641,15 +722,60 @@ var SelectedArtist = function (_React$Component) {
 
   }, {
     key: 'skipTrack',
-    value: function skipTrack() {
-      var newList = this.state.potentialTracks.splice(1);
-      //Ensure no visited track here?
-      this.setState({
-        potentialTracks: newList,
-        selectedTrack: newList[0],
-        selectedArtist: newList[0].artists[0]
-      });
-    }
+    value: function () {
+      var _ref6 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee6() {
+        var newList, oldAudio;
+        return regeneratorRuntime.wrap(function _callee6$(_context6) {
+          while (1) {
+            switch (_context6.prev = _context6.next) {
+              case 0:
+                if (!(this.state.potentialTracks.length <= 1)) {
+                  _context6.next = 6;
+                  break;
+                }
+
+                _context6.next = 3;
+                return this.setState({
+                  outOfSuggestions: true
+                });
+
+              case 3:
+                alert('Out of suggestions! Try starting again with a new artist');
+                _context6.next = 13;
+                break;
+
+              case 6:
+                newList = this.state.potentialTracks.splice(1);
+                //Ensure no visited track here?
+
+                _context6.next = 9;
+                return this.setState({
+                  potentialTracks: newList,
+                  selectedTrack: newList[0],
+                  selectedArtist: newList[0].artists[0]
+                });
+
+              case 9:
+                oldAudio = this.state.audio;
+
+                oldAudio.src = this.state.selectedTrack.preview_url;
+                _context6.next = 13;
+                return this.play();
+
+              case 13:
+              case 'end':
+                return _context6.stop();
+            }
+          }
+        }, _callee6, this);
+      }));
+
+      function skipTrack() {
+        return _ref6.apply(this, arguments);
+      }
+
+      return skipTrack;
+    }()
     //Adjust seed and get new recommendation from new seed
 
   }, {
@@ -657,12 +783,74 @@ var SelectedArtist = function (_React$Component) {
     value: function likeTrack() {
       var prevSeedTracks = this.state.seedTracks;
       prevSeedTracks.push(this.state.selectedTrack);
-      if (prevSeedTracks.length > 4) prevSeedTracks = prevSeedTracks.splice(1); //Remove oldest seed element
+      if (prevSeedTracks.length > 4) prevSeedTracks.shift(); //Remove oldest seed element
       this.setState({
         seedTracks: prevSeedTracks
       });
       this.findNewTracks();
     }
+
+    //music
+
+  }, {
+    key: 'togglePlay',
+    value: function () {
+      var _ref7 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee7() {
+        return regeneratorRuntime.wrap(function _callee7$(_context7) {
+          while (1) {
+            switch (_context7.prev = _context7.next) {
+              case 0:
+                _context7.next = 2;
+                return this.setState({ playing: !this.state.playing });
+
+              case 2:
+                this.state.playing ? this.state.audio.play() : this.state.audio.pause();
+
+              case 3:
+              case 'end':
+                return _context7.stop();
+            }
+          }
+        }, _callee7, this);
+      }));
+
+      function togglePlay() {
+        return _ref7.apply(this, arguments);
+      }
+
+      return togglePlay;
+    }()
+  }, {
+    key: 'play',
+    value: function () {
+      var _ref8 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee8() {
+        return regeneratorRuntime.wrap(function _callee8$(_context8) {
+          while (1) {
+            switch (_context8.prev = _context8.next) {
+              case 0:
+                _context8.next = 2;
+                return this.setState({
+                  playing: true
+                });
+
+              case 2:
+                _context8.next = 4;
+                return this.state.audio.play();
+
+              case 4:
+              case 'end':
+                return _context8.stop();
+            }
+          }
+        }, _callee8, this);
+      }));
+
+      function play() {
+        return _ref8.apply(this, arguments);
+      }
+
+      return play;
+    }()
   }]);
 
   return SelectedArtist;

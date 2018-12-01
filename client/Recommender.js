@@ -12,14 +12,16 @@ export const Recommender = props => {
       <button
         className="recommend-button"
         id="like-button"
-        onClick={() => props.likeTrack()}
+        onClick={async () => await props.likeTrack()}
+        disabled={props.outOfSuggestions}
       >
         Like!
       </button>
       <button
         className="recommend-button"
         id="dislike-button"
-        onClick={() => props.skipTrack()}
+        onClick={async () => await props.skipTrack()}
+        disabled={props.outOfSuggestions}
       >
         Dislike
       </button>

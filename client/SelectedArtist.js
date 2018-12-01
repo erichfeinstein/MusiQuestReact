@@ -17,22 +17,36 @@ export default class SelectedArtist extends React.Component {
       seedArtists: [],
       seedTracks: [],
       potentialTracks: [],
+      outOfSuggestions: false,
+      playing: false,
+      audio: {},
     };
     this.findNewTracks = this.findNewTracks.bind(this);
     this.selectTrack = this.selectTrack.bind(this);
     this.skipTrack = this.skipTrack.bind(this);
     this.likeTrack = this.likeTrack.bind(this);
+    this.togglePlay = this.togglePlay.bind(this);
+    this.play = this.play.bind(this);
   }
 
   async componentDidMount() {
     await this.setState({
       selectedArtist: this.props.artist,
+      audio: new Audio(),
     });
+
     const topTracks = await axios.get(
       `/api/${this.state.selectedArtist.id}/top-tracks`
     );
     this.setState({
       topTracks: topTracks.data,
+    });
+  }
+  async componentWillUnmount() {
+    let music = this.state.audio;
+    music.src = '';
+    await this.setState({
+      audio: {},
     });
   }
 
@@ -54,6 +68,7 @@ export default class SelectedArtist extends React.Component {
               {this.state.topTracks.map(track => {
                 return (
                   <li
+                    className="popular-track-li"
                     onClick={async () => {
                       await this.selectTrack(track);
                       await this.findNewTracks();
@@ -73,6 +88,7 @@ export default class SelectedArtist extends React.Component {
             track={this.state.selectedTrack}
             skipTrack={this.skipTrack}
             likeTrack={this.likeTrack}
+            outOfSuggestions={this.state.outOfSuggestions}
           />
         )}
       </div>
@@ -85,7 +101,7 @@ export default class SelectedArtist extends React.Component {
     newSeedTracks.push(trackInfo.data);
     let newSeedArtists = this.state.seedArtists;
     newSeedArtists.push(trackInfo.data.artists[0]);
-    this.setState({
+    await this.setState({
       selectedTrack: trackInfo.data,
       selectedArtist: trackInfo.data.artists[0],
       seedTracks: newSeedTracks,
@@ -102,30 +118,55 @@ export default class SelectedArtist extends React.Component {
         })
         .join('%2C')}`
     );
-    this.setState({
+    await this.setState({
       potentialTracks: result.data.tracks,
       selectedTrack: result.data.tracks[0],
       selectedArtist: result.data.tracks[0].artists[0],
     });
+    let oldAudio = this.state.audio;
+    oldAudio.src = this.state.selectedTrack.preview_url;
+    await this.play();
   }
   //Get next song from previous recommendations
-  skipTrack() {
-    let newList = this.state.potentialTracks.splice(1);
-    //Ensure no visited track here?
-    this.setState({
-      potentialTracks: newList,
-      selectedTrack: newList[0],
-      selectedArtist: newList[0].artists[0],
-    });
+  async skipTrack() {
+    if (this.state.potentialTracks.length <= 1) {
+      await this.setState({
+        outOfSuggestions: true,
+      });
+      alert('Out of suggestions! Try starting again with a new artist');
+    } else {
+      let newList = this.state.potentialTracks.splice(1);
+      //Ensure no visited track here?
+      await this.setState({
+        potentialTracks: newList,
+        selectedTrack: newList[0],
+        selectedArtist: newList[0].artists[0],
+      });
+      let oldAudio = this.state.audio;
+      oldAudio.src = this.state.selectedTrack.preview_url;
+      await this.play();
+    }
   }
   //Adjust seed and get new recommendation from new seed
   likeTrack() {
     let prevSeedTracks = this.state.seedTracks;
     prevSeedTracks.push(this.state.selectedTrack);
-    if (prevSeedTracks.length > 4) prevSeedTracks = prevSeedTracks.splice(1); //Remove oldest seed element
+    if (prevSeedTracks.length > 4) prevSeedTracks.shift(); //Remove oldest seed element
     this.setState({
       seedTracks: prevSeedTracks,
     });
     this.findNewTracks();
+  }
+
+  //music
+  async togglePlay() {
+    await this.setState({ playing: !this.state.playing });
+    this.state.playing ? this.state.audio.play() : this.state.audio.pause();
+  }
+  async play() {
+    await this.setState({
+      playing: true,
+    });
+    await this.state.audio.play();
   }
 }
