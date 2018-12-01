@@ -21,6 +21,7 @@ export default class SelectedArtist extends React.Component {
     this.findNewTracks = this.findNewTracks.bind(this);
     this.selectTrack = this.selectTrack.bind(this);
     this.skipTrack = this.skipTrack.bind(this);
+    this.likeTrack = this.likeTrack.bind(this);
   }
 
   async componentDidMount() {
@@ -67,9 +68,11 @@ export default class SelectedArtist extends React.Component {
           </div>
         ) : (
           <Recommender
+            id="recommender"
             artist={this.state.selectedArtist}
             track={this.state.selectedTrack}
             skipTrack={this.skipTrack}
+            likeTrack={this.likeTrack}
           />
         )}
       </div>
@@ -80,17 +83,24 @@ export default class SelectedArtist extends React.Component {
     const trackInfo = await axios.get(`/api/tracks/${track.id}`);
     let newSeedTracks = this.state.seedTracks;
     newSeedTracks.push(trackInfo.data);
+    let newSeedArtists = this.state.seedArtists;
+    newSeedArtists.push(trackInfo.data.artists[0]);
     this.setState({
       selectedTrack: trackInfo.data,
       selectedArtist: trackInfo.data.artists[0],
       seedTracks: newSeedTracks,
+      seedArtists: newSeedArtists,
     });
   }
   async findNewTracks() {
     const result = await axios.get(
-      `/api/recommend?artistId=${this.state.selectedArtist.id}&trackId=${
-        this.state.selectedTrack.id
-      }`
+      `/api/recommend?artistId=${
+        this.state.selectedArtist.id
+      }&trackIds=${this.state.seedTracks
+        .map(track => {
+          return track.id;
+        })
+        .join('%2C')}`
     );
     this.setState({
       potentialTracks: result.data.tracks,
@@ -101,12 +111,21 @@ export default class SelectedArtist extends React.Component {
   //Get next song from previous recommendations
   skipTrack() {
     let newList = this.state.potentialTracks.splice(1);
-    console.log(newList);
+    //Ensure no visited track here?
     this.setState({
       potentialTracks: newList,
       selectedTrack: newList[0],
       selectedArtist: newList[0].artists[0],
     });
   }
-  //TODO like track handler
+  //Adjust seed and get new recommendation from new seed
+  likeTrack() {
+    let prevSeedTracks = this.state.seedTracks;
+    prevSeedTracks.push(this.state.selectedTrack);
+    if (prevSeedTracks.length > 4) prevSeedTracks = prevSeedTracks.splice(1); //Remove oldest seed element
+    this.setState({
+      seedTracks: prevSeedTracks,
+    });
+    this.findNewTracks();
+  }
 }

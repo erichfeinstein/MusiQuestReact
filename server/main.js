@@ -25,8 +25,8 @@ app.get('/api/tracks/:trackId', async function(req, res, next) {
 //Generate recommendations
 app.get('/api/recommend/', async function(req, res, next) {
   const artistID = req.query.artistId;
-  const trackID = req.query.trackId ? req.query.trackId : '';
-  const result = await queries.getRecommendations(artistID, trackID);
+  const trackIDs = req.query.trackIds;
+  const result = await queries.getRecommendations(artistID, trackIDs);
   res.json(result);
 });
 

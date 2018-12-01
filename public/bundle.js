@@ -354,29 +354,42 @@ var _react2 = _interopRequireDefault(_react);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var Recommender = exports.Recommender = function Recommender(props) {
-  //   const artistName = props.artist.name;
-  //   const trackName = props.track.name;
-  //probably more here
   return _react2.default.createElement(
-    'div',
+    "div",
     null,
-    props.track.name,
-    ' by ',
-    props.artist.name,
-    props.track.album && _react2.default.createElement('img', { src: props.track.album.images[0].url }),
     _react2.default.createElement(
-      'button',
-      { onClick: function onClick() {
-          return props.skipTrack();
-        } },
-      'Like!'
+      "div",
+      null,
+      props.track.name,
+      " by ",
+      props.artist.name
     ),
     _react2.default.createElement(
-      'button',
-      { onClick: function onClick() {
+      "div",
+      { id: "discovered-img" },
+      props.track.album && _react2.default.createElement("img", { src: props.track.album.images[0].url })
+    ),
+    _react2.default.createElement(
+      "button",
+      {
+        className: "recommend-button",
+        id: "like-button",
+        onClick: function onClick() {
+          return props.likeTrack();
+        }
+      },
+      "Like!"
+    ),
+    _react2.default.createElement(
+      "button",
+      {
+        className: "recommend-button",
+        id: "dislike-button",
+        onClick: function onClick() {
           return props.skipTrack();
-        } },
-      'Dislike'
+        }
+      },
+      "Dislike"
     )
   );
 };
@@ -442,6 +455,7 @@ var SelectedArtist = function (_React$Component) {
     _this.findNewTracks = _this.findNewTracks.bind(_this);
     _this.selectTrack = _this.selectTrack.bind(_this);
     _this.skipTrack = _this.skipTrack.bind(_this);
+    _this.likeTrack = _this.likeTrack.bind(_this);
     return _this;
   }
 
@@ -537,9 +551,11 @@ var SelectedArtist = function (_React$Component) {
             })
           )
         ) : _react2.default.createElement(_Recommender.Recommender, {
+          id: 'recommender',
           artist: this.state.selectedArtist,
           track: this.state.selectedTrack,
-          skipTrack: this.skipTrack
+          skipTrack: this.skipTrack,
+          likeTrack: this.likeTrack
         })
       );
     }
@@ -547,7 +563,7 @@ var SelectedArtist = function (_React$Component) {
     key: 'selectTrack',
     value: function () {
       var _ref3 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(track) {
-        var trackInfo, newSeedTracks;
+        var trackInfo, newSeedTracks, newSeedArtists;
         return regeneratorRuntime.wrap(function _callee3$(_context3) {
           while (1) {
             switch (_context3.prev = _context3.next) {
@@ -560,13 +576,17 @@ var SelectedArtist = function (_React$Component) {
                 newSeedTracks = this.state.seedTracks;
 
                 newSeedTracks.push(trackInfo.data);
+                newSeedArtists = this.state.seedArtists;
+
+                newSeedArtists.push(trackInfo.data.artists[0]);
                 this.setState({
                   selectedTrack: trackInfo.data,
                   selectedArtist: trackInfo.data.artists[0],
-                  seedTracks: newSeedTracks
+                  seedTracks: newSeedTracks,
+                  seedArtists: newSeedArtists
                 });
 
-              case 6:
+              case 8:
               case 'end':
                 return _context3.stop();
             }
@@ -590,7 +610,9 @@ var SelectedArtist = function (_React$Component) {
             switch (_context4.prev = _context4.next) {
               case 0:
                 _context4.next = 2;
-                return _axios2.default.get('/api/recommend?artistId=' + this.state.selectedArtist.id + '&trackId=' + this.state.selectedTrack.id);
+                return _axios2.default.get('/api/recommend?artistId=' + this.state.selectedArtist.id + '&trackIds=' + this.state.seedTracks.map(function (track) {
+                  return track.id;
+                }).join('%2C'));
 
               case 2:
                 result = _context4.sent;
@@ -621,15 +643,26 @@ var SelectedArtist = function (_React$Component) {
     key: 'skipTrack',
     value: function skipTrack() {
       var newList = this.state.potentialTracks.splice(1);
-      console.log(newList);
+      //Ensure no visited track here?
       this.setState({
         potentialTracks: newList,
         selectedTrack: newList[0],
         selectedArtist: newList[0].artists[0]
       });
     }
-    //TODO like track handler
+    //Adjust seed and get new recommendation from new seed
 
+  }, {
+    key: 'likeTrack',
+    value: function likeTrack() {
+      var prevSeedTracks = this.state.seedTracks;
+      prevSeedTracks.push(this.state.selectedTrack);
+      if (prevSeedTracks.length > 4) prevSeedTracks = prevSeedTracks.splice(1); //Remove oldest seed element
+      this.setState({
+        seedTracks: prevSeedTracks
+      });
+      this.findNewTracks();
+    }
   }]);
 
   return SelectedArtist;

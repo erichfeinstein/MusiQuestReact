@@ -54,14 +54,12 @@ async function findBestTracks(artistId) {
   }
 }
 
-async function getRecommendations(artist = '', track = '') {
+async function getRecommendations(artist = '', tracks = '') {
   const token = (await tokenPromise).data.access_token;
   try {
     const trackRecs = await axios({
       method: 'get',
-      url: `https://api.spotify.com/v1/recommendations?seed_artists=${artist}${
-        track !== '' ? '&seed_tracks=' + track : ''
-      }`,
+      url: `https://api.spotify.com/v1/recommendations?seed_artists=${artist}&seed_tracks=${tracks}`,
       headers: { Authorization: `Bearer ${token}` },
     });
     return trackRecs.data;

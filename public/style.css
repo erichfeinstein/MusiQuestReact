@@ -62,7 +62,7 @@ body {
   border-radius: 20px;
   outline-style: none;
 }
-#search-area button {
+button {
   padding: 1em;
   width: 75px;
   border-radius: 20px;
@@ -100,4 +100,31 @@ body {
   list-style: none;
   padding: 0;
   margin: 0;
+}
+#recommender {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  text-align: center;
+}
+#discovered-img {
+  padding: 2em;
+}
+.recommend-button {
+  color: white;
+  margin: 2em;
+  transition: background-color, 0.3s;
+}
+#like-button {
+  background-color: #22b210;
+}
+#like-button:hover {
+  background-color: #29e212;
+}
+#dislike-button {
+  background-color: #bc0707;
+}
+#dislike-button:hover {
+  background-color: #d80808;
 }
