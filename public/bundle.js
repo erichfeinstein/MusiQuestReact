@@ -192,7 +192,6 @@ var App = function (_React$Component) {
     key: 'selectArtist',
     value: function () {
       var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(artist) {
-        var result;
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
@@ -204,27 +203,11 @@ var App = function (_React$Component) {
                 });
 
               case 2:
-                _context.prev = 2;
-                _context.next = 5;
-                return _axios2.default.get('/api/' + this.state.currentArtist.id + '/related-artists');
-
-              case 5:
-                result = _context.sent;
-                _context.next = 11;
-                break;
-
-              case 8:
-                _context.prev = 8;
-                _context.t0 = _context['catch'](2);
-
-                console.error(_context.t0);
-
-              case 11:
               case 'end':
                 return _context.stop();
             }
           }
-        }, _callee, this, [[2, 8]]);
+        }, _callee, this);
       }));
 
       function selectArtist(_x) {
@@ -349,6 +332,57 @@ exports.default = ArtistList;
 
 /***/ }),
 
+/***/ "./client/Recommender.js":
+/*!*******************************!*\
+  !*** ./client/Recommender.js ***!
+  \*******************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Recommender = undefined;
+
+var _react = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var Recommender = exports.Recommender = function Recommender(props) {
+  //   const artistName = props.artist.name;
+  //   const trackName = props.track.name;
+  //probably more here
+  return _react2.default.createElement(
+    'div',
+    null,
+    props.track.name,
+    ' by ',
+    props.artist.name,
+    props.track.album && _react2.default.createElement('img', { src: props.track.album.images[0].url }),
+    _react2.default.createElement(
+      'button',
+      { onClick: function onClick() {
+          return props.skipTrack();
+        } },
+      'Like!'
+    ),
+    _react2.default.createElement(
+      'button',
+      { onClick: function onClick() {
+          return props.skipTrack();
+        } },
+      'Dislike'
+    )
+  );
+};
+
+/***/ }),
+
 /***/ "./client/SelectedArtist.js":
 /*!**********************************!*\
   !*** ./client/SelectedArtist.js ***!
@@ -372,6 +406,8 @@ var _react2 = _interopRequireDefault(_react);
 var _axios = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 
 var _axios2 = _interopRequireDefault(_axios);
+
+var _Recommender = __webpack_require__(/*! ./Recommender */ "./client/Recommender.js");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -397,11 +433,15 @@ var SelectedArtist = function (_React$Component) {
 
     _this.state = {
       topTracks: [],
-      artist: {},
-      selectedTrack: {}
+      selectedArtist: {},
+      selectedTrack: {},
+      seedArtists: [],
+      seedTracks: [],
+      potentialTracks: []
     };
-    _this.findNewTrack = _this.findNewTrack.bind(_this);
+    _this.findNewTracks = _this.findNewTracks.bind(_this);
     _this.selectTrack = _this.selectTrack.bind(_this);
+    _this.skipTrack = _this.skipTrack.bind(_this);
     return _this;
   }
 
@@ -416,12 +456,12 @@ var SelectedArtist = function (_React$Component) {
               case 0:
                 _context.next = 2;
                 return this.setState({
-                  artist: this.props.artist
+                  selectedArtist: this.props.artist
                 });
 
               case 2:
                 _context.next = 4;
-                return _axios2.default.get('/api/' + this.state.artist.id + '/top-tracks');
+                return _axios2.default.get('/api/' + this.state.selectedArtist.id + '/top-tracks');
 
               case 4:
                 topTracks = _context.sent;
@@ -452,56 +492,62 @@ var SelectedArtist = function (_React$Component) {
       return _react2.default.createElement(
         'div',
         { id: 'selected-artist' },
-        _react2.default.createElement(
+        this.state.seedArtists.length === 0 && this.state.seedTracks.length === 0 ? _react2.default.createElement(
           'div',
           null,
-          this.state.selectedTrack.id ? this.state.selectedTrack.name : 'Choose a song'
-        ),
-        this.state.selectedTrack.album && _react2.default.createElement('img', { src: this.state.selectedTrack.album.images[0].url }),
-        _react2.default.createElement('img', {
-          src: this.state.artist.images ? this.state.artist.images[0].url : 'http://media.virbcdn.com/cdn_images/crop_300x300/cd/default_song_album.jpg'
-        }),
-        _react2.default.createElement(
-          'div',
-          null,
-          'Popular songs by ',
-          this.state.artist.name
-        ),
-        _react2.default.createElement(
-          'ul',
-          null,
-          this.state.topTracks.map(function (track) {
-            return _react2.default.createElement(
-              'li',
-              {
-                onClick: _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
-                  return regeneratorRuntime.wrap(function _callee2$(_context2) {
-                    while (1) {
-                      switch (_context2.prev = _context2.next) {
-                        case 0:
-                          _context2.next = 2;
-                          return _this2.selectTrack(track);
+          _react2.default.createElement('img', {
+            src: this.state.selectedArtist.images ? this.state.selectedArtist.images[0].url : 'http://media.virbcdn.com/cdn_images/crop_300x300/cd/default_song_album.jpg'
+          }),
+          _react2.default.createElement(
+            'div',
+            null,
+            'Popular songs by ',
+            this.state.selectedArtist.name
+          ),
+          _react2.default.createElement(
+            'ul',
+            null,
+            this.state.topTracks.map(function (track) {
+              return _react2.default.createElement(
+                'li',
+                {
+                  onClick: _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
+                    return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                      while (1) {
+                        switch (_context2.prev = _context2.next) {
+                          case 0:
+                            _context2.next = 2;
+                            return _this2.selectTrack(track);
 
-                        case 2:
-                        case 'end':
-                          return _context2.stop();
+                          case 2:
+                            _context2.next = 4;
+                            return _this2.findNewTracks();
+
+                          case 4:
+                          case 'end':
+                            return _context2.stop();
+                        }
                       }
-                    }
-                  }, _callee2, _this2);
-                })),
-                key: track.id
-              },
-              track.name
-            );
-          })
-        )
+                    }, _callee2, _this2);
+                  })),
+                  key: track.id
+                },
+                track.name
+              );
+            })
+          )
+        ) : _react2.default.createElement(_Recommender.Recommender, {
+          artist: this.state.selectedArtist,
+          track: this.state.selectedTrack,
+          skipTrack: this.skipTrack
+        })
       );
     }
   }, {
     key: 'selectTrack',
     value: function () {
       var _ref3 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(track) {
-        var trackInfo;
+        var trackInfo, newSeedTracks;
         return regeneratorRuntime.wrap(function _callee3$(_context3) {
           while (1) {
             switch (_context3.prev = _context3.next) {
@@ -511,13 +557,16 @@ var SelectedArtist = function (_React$Component) {
 
               case 2:
                 trackInfo = _context3.sent;
+                newSeedTracks = this.state.seedTracks;
 
+                newSeedTracks.push(trackInfo.data);
                 this.setState({
-                  selectedTrack: trackInfo.data
+                  selectedTrack: trackInfo.data,
+                  selectedArtist: trackInfo.data.artists[0],
+                  seedTracks: newSeedTracks
                 });
-                console.log(this.state.selectedTrack);
 
-              case 5:
+              case 6:
               case 'end':
                 return _context3.stop();
             }
@@ -532,7 +581,7 @@ var SelectedArtist = function (_React$Component) {
       return selectTrack;
     }()
   }, {
-    key: 'findNewTrack',
+    key: 'findNewTracks',
     value: function () {
       var _ref4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4() {
         var result;
@@ -541,13 +590,15 @@ var SelectedArtist = function (_React$Component) {
             switch (_context4.prev = _context4.next) {
               case 0:
                 _context4.next = 2;
-                return _axios2.default.get('/api/' + this.state.artist.id + '/' + this.state.selectedTrack.id + '/new-track');
+                return _axios2.default.get('/api/recommend?artistId=' + this.state.selectedArtist.id + '&trackId=' + this.state.selectedTrack.id);
 
               case 2:
                 result = _context4.sent;
 
                 this.setState({
-                  selectedTrack: result.data
+                  potentialTracks: result.data.tracks,
+                  selectedTrack: result.data.tracks[0],
+                  selectedArtist: result.data.tracks[0].artists[0]
                 });
 
               case 4:
@@ -558,12 +609,27 @@ var SelectedArtist = function (_React$Component) {
         }, _callee4, this);
       }));
 
-      function findNewTrack() {
+      function findNewTracks() {
         return _ref4.apply(this, arguments);
       }
 
-      return findNewTrack;
+      return findNewTracks;
     }()
+    //Get next song from previous recommendations
+
+  }, {
+    key: 'skipTrack',
+    value: function skipTrack() {
+      var newList = this.state.potentialTracks.splice(1);
+      console.log(newList);
+      this.setState({
+        potentialTracks: newList,
+        selectedTrack: newList[0],
+        selectedArtist: newList[0].artists[0]
+      });
+    }
+    //TODO like track handler
+
   }]);
 
   return SelectedArtist;

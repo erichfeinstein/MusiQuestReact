@@ -10,43 +10,30 @@ app.get('/', function(req, res, next) {
   res.sendFile(path.join(__dirname, '..', '/client/index.html'));
 });
 
-app.get('/api/tracks/:trackId', async function(req, res, next) {
-  const result = await queries.findTrackInfo(req.params.trackId);
-  res.json(result);
-});
-
+//Initial search
 app.get('/api/search-artist', async function(req, res, next) {
   const result = await queries.searchArtistOrSong(req.query.artist, 'artist');
   res.json(result);
 });
 
-app.get('/api/:artistId/related-artists', async function(req, res, next) {
-  const result = await queries.findRelatedArtists(req.params.artistId);
+//Used when selecting track from list
+app.get('/api/tracks/:trackId', async function(req, res, next) {
+  const result = await queries.findTrackInfo(req.params.trackId);
   res.json(result);
 });
 
+//Generate recommendations
+app.get('/api/recommend/', async function(req, res, next) {
+  const artistID = req.query.artistId;
+  const trackID = req.query.trackId ? req.query.trackId : '';
+  const result = await queries.getRecommendations(artistID, trackID);
+  res.json(result);
+});
+
+//Retrieve an artist's top tracks to present to user
 app.get('/api/:artistId/top-tracks', async function(req, res, next) {
   const result = await queries.findBestTracks(req.params.artistId);
   res.json(result);
-});
-
-//Will we need to pass the visisted tracks here?
-//I think this may call for a DB
-//User hasMany Artists (that they've already discovered)
-//Artists belongsToMany User (who have discovered them)
-app.get('/api/:artistId/:trackId/new-track', async function(req, res, next) {
-  //related artists -> best tracks (or maybe all tracks) -> compare tracks
-  const relatedArtists = await queries.findRelatedArtists(req.params.artistId);
-  //For now we will just look at the first artist
-  const newArtistTopTracks = await queries.findBestTracks(
-    relatedArtists.artists[0].id
-  );
-  const suggestedTrack = await queries.bestTrackFromList(
-    req.params.trackId,
-    newArtistTopTracks
-  );
-  console.log('suggesting track', suggestedTrack);
-  res.json(suggestedTrack);
 });
 
 const PORT = 8080;
