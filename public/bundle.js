@@ -487,7 +487,8 @@ var SelectedArtist = function (_React$Component) {
       potentialTracks: [],
       outOfSuggestions: false,
       playing: false,
-      audio: {}
+      audio: {},
+      visitedTrackIds: []
     };
     _this.findNewTracks = _this.findNewTracks.bind(_this);
     _this.selectTrack = _this.selectTrack.bind(_this);
@@ -678,7 +679,7 @@ var SelectedArtist = function (_React$Component) {
     key: 'findNewTracks',
     value: function () {
       var _ref5 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5() {
-        var result, oldAudio;
+        var result, oldVisitedTrackIds, oldAudio;
         return regeneratorRuntime.wrap(function _callee5$(_context5) {
           while (1) {
             switch (_context5.prev = _context5.next) {
@@ -690,21 +691,31 @@ var SelectedArtist = function (_React$Component) {
 
               case 2:
                 result = _context5.sent;
-                _context5.next = 5;
+
+                //Ensure the next track has not been visited
+                oldVisitedTrackIds = this.state.visitedTrackIds;
+
+                while (oldVisitedTrackIds.indexOf(result.data.tracks[0].id) > 0) {
+                  console.log('found a visited track. skipping');
+                  result.data.tracks.shift(1);
+                }
+                oldVisitedTrackIds.push(result.data.tracks[0].id);
+                _context5.next = 8;
                 return this.setState({
                   potentialTracks: result.data.tracks,
                   selectedTrack: result.data.tracks[0],
-                  selectedArtist: result.data.tracks[0].artists[0]
+                  selectedArtist: result.data.tracks[0].artists[0],
+                  visitedTrackIds: oldVisitedTrackIds
                 });
 
-              case 5:
+              case 8:
                 oldAudio = this.state.audio;
 
                 oldAudio.src = this.state.selectedTrack.preview_url;
-                _context5.next = 9;
+                _context5.next = 12;
                 return this.play();
 
-              case 9:
+              case 12:
               case 'end':
                 return _context5.stop();
             }
@@ -724,7 +735,7 @@ var SelectedArtist = function (_React$Component) {
     key: 'skipTrack',
     value: function () {
       var _ref6 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee6() {
-        var newList, oldAudio;
+        var newList, oldVisitedTrackIds, oldAudio;
         return regeneratorRuntime.wrap(function _callee6$(_context6) {
           while (1) {
             switch (_context6.prev = _context6.next) {
@@ -741,28 +752,36 @@ var SelectedArtist = function (_React$Component) {
 
               case 3:
                 alert('Out of suggestions! Try starting again with a new artist');
-                _context6.next = 13;
+                _context6.next = 16;
                 break;
 
               case 6:
                 newList = this.state.potentialTracks.splice(1);
-                //Ensure no visited track here?
+                //Ensure the next track has not been visited
 
-                _context6.next = 9;
+                oldVisitedTrackIds = this.state.visitedTrackIds;
+
+                while (oldVisitedTrackIds.indexOf(newList[0].id) > 0) {
+                  console.log('found a visited track. skipping');
+                  newList.shift(1);
+                }
+                oldVisitedTrackIds.push(newList[0].id);
+                _context6.next = 12;
                 return this.setState({
                   potentialTracks: newList,
                   selectedTrack: newList[0],
-                  selectedArtist: newList[0].artists[0]
+                  selectedArtist: newList[0].artists[0],
+                  visitedTrackIds: oldVisitedTrackIds
                 });
 
-              case 9:
+              case 12:
                 oldAudio = this.state.audio;
 
                 oldAudio.src = this.state.selectedTrack.preview_url;
-                _context6.next = 13;
+                _context6.next = 16;
                 return this.play();
 
-              case 13:
+              case 16:
               case 'end':
                 return _context6.stop();
             }

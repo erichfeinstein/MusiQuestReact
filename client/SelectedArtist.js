@@ -20,6 +20,7 @@ export default class SelectedArtist extends React.Component {
       outOfSuggestions: false,
       playing: false,
       audio: {},
+      visitedTrackIds: [],
     };
     this.findNewTracks = this.findNewTracks.bind(this);
     this.selectTrack = this.selectTrack.bind(this);
@@ -118,10 +119,18 @@ export default class SelectedArtist extends React.Component {
         })
         .join('%2C')}`
     );
+    //Ensure the next track has not been visited
+    let oldVisitedTrackIds = this.state.visitedTrackIds;
+    while (oldVisitedTrackIds.indexOf(result.data.tracks[0].id) > 0) {
+      console.log('found a visited track. skipping');
+      result.data.tracks.shift(1);
+    }
+    oldVisitedTrackIds.push(result.data.tracks[0].id);
     await this.setState({
       potentialTracks: result.data.tracks,
       selectedTrack: result.data.tracks[0],
       selectedArtist: result.data.tracks[0].artists[0],
+      visitedTrackIds: oldVisitedTrackIds,
     });
     let oldAudio = this.state.audio;
     oldAudio.src = this.state.selectedTrack.preview_url;
@@ -136,11 +145,18 @@ export default class SelectedArtist extends React.Component {
       alert('Out of suggestions! Try starting again with a new artist');
     } else {
       let newList = this.state.potentialTracks.splice(1);
-      //Ensure no visited track here?
+      //Ensure the next track has not been visited
+      let oldVisitedTrackIds = this.state.visitedTrackIds;
+      while (oldVisitedTrackIds.indexOf(newList[0].id) > 0) {
+        console.log('found a visited track. skipping');
+        newList.shift(1);
+      }
+      oldVisitedTrackIds.push(newList[0].id);
       await this.setState({
         potentialTracks: newList,
         selectedTrack: newList[0],
         selectedArtist: newList[0].artists[0],
+        visitedTrackIds: oldVisitedTrackIds,
       });
       let oldAudio = this.state.audio;
       oldAudio.src = this.state.selectedTrack.preview_url;
