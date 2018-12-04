@@ -30,6 +30,18 @@ export default class SelectedArtist extends React.Component {
     this.play = this.play.bind(this);
   }
 
+  //handle volume changes
+  componentDidUpdate(prevProps, prevState) {
+    if (prevProps.audioEnabled !== this.props.audioEnabled) {
+      let newVolume;
+      this.props.audioEnabled ? (newVolume = 1) : (newVolume = 0);
+      let oldAudio = this.state.audio;
+      oldAudio.volume = newVolume;
+      this.setState({ prevState, audio: oldAudio });
+      console.log('changing audio setting');
+    }
+  }
+
   async componentDidMount() {
     await this.setState({
       selectedArtist: this.props.artist,
@@ -51,6 +63,7 @@ export default class SelectedArtist extends React.Component {
     });
   }
 
+  //TODO add an audio off button
   render() {
     return (
       <div id="selected-artist">
@@ -164,14 +177,14 @@ export default class SelectedArtist extends React.Component {
     }
   }
   //Adjust seed and get new recommendation from new seed
-  likeTrack() {
+  async likeTrack() {
     let prevSeedTracks = this.state.seedTracks;
     prevSeedTracks.push(this.state.selectedTrack);
     if (prevSeedTracks.length > 4) prevSeedTracks.shift(); //Remove oldest seed element
-    this.setState({
+    await this.setState({
       seedTracks: prevSeedTracks,
     });
-    this.findNewTracks();
+    await this.findNewTracks();
   }
 
   //music

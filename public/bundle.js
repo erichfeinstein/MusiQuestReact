@@ -141,10 +141,12 @@ var App = function (_React$Component) {
     _this.state = {
       currentSong: {},
       currentArtist: {},
-      artists: []
+      artists: [],
+      audioEnabled: true
     };
     _this.searchArtist = _this.searchArtist.bind(_this);
     _this.selectArtist = _this.selectArtist.bind(_this);
+    _this.toggleAudio = _this.toggleAudio.bind(_this);
     return _this;
   }
 
@@ -160,8 +162,18 @@ var App = function (_React$Component) {
         null,
         _react2.default.createElement(
           'div',
-          { id: 'header' },
-          'MusiQuest'
+          { className: 'home', align: 'center' },
+          _react2.default.createElement(
+            'div',
+            { id: 'header' },
+            'MusiQuest'
+          ),
+          _react2.default.createElement(
+            'button',
+            { id: 'toggle-audio-button', onClick: this.toggleAudio },
+            'Music: ',
+            this.state.audioEnabled ? 'On' : 'Off'
+          )
         ),
         _react2.default.createElement(
           'div',
@@ -172,14 +184,29 @@ var App = function (_React$Component) {
             {
               id: 'search-button',
               type: 'submit',
-              onClick: function onClick() {
-                _this2.searchArtist();
-              }
+              onClick: _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
+                return regeneratorRuntime.wrap(function _callee$(_context) {
+                  while (1) {
+                    switch (_context.prev = _context.next) {
+                      case 0:
+                        _context.next = 2;
+                        return _this2.searchArtist();
+
+                      case 2:
+                      case 'end':
+                        return _context.stop();
+                    }
+                  }
+                }, _callee, _this2);
+              }))
             },
             'Search!'
           )
         ),
-        this.state.currentArtist.id ? _react2.default.createElement(_SelectedArtist2.default, { artist: this.state.currentArtist }) : _react2.default.createElement(_ArtistList2.default, {
+        this.state.currentArtist.id ? _react2.default.createElement(_SelectedArtist2.default, {
+          artist: this.state.currentArtist,
+          audioEnabled: this.state.audioEnabled
+        }) : _react2.default.createElement(_ArtistList2.default, {
           artists: this.state.artists,
           selectArtist: this.selectArtist
         })
@@ -191,12 +218,12 @@ var App = function (_React$Component) {
   }, {
     key: 'selectArtist',
     value: function () {
-      var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(artist) {
-        return regeneratorRuntime.wrap(function _callee$(_context) {
+      var _ref2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(artist) {
+        return regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
-            switch (_context.prev = _context.next) {
+            switch (_context2.prev = _context2.next) {
               case 0:
-                _context.next = 2;
+                _context2.next = 2;
                 return this.setState({
                   artists: [],
                   currentArtist: artist
@@ -204,14 +231,14 @@ var App = function (_React$Component) {
 
               case 2:
               case 'end':
-                return _context.stop();
+                return _context2.stop();
             }
           }
-        }, _callee, this);
+        }, _callee2, this);
       }));
 
       function selectArtist(_x) {
-        return _ref.apply(this, arguments);
+        return _ref2.apply(this, arguments);
       }
 
       return selectArtist;
@@ -222,50 +249,63 @@ var App = function (_React$Component) {
   }, {
     key: 'searchArtist',
     value: function () {
-      var _ref2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
+      var _ref3 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3() {
         var query, result;
-        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+        return regeneratorRuntime.wrap(function _callee3$(_context3) {
           while (1) {
-            switch (_context2.prev = _context2.next) {
+            switch (_context3.prev = _context3.next) {
               case 0:
-                this.setState({
+                _context3.next = 2;
+                return this.setState({
                   currentArtist: {}
                 });
-                _context2.prev = 1;
+
+              case 2:
+                _context3.prev = 2;
                 query = document.getElementById('search-input').value;
-                _context2.next = 5;
+                _context3.next = 6;
                 return _axios2.default.get('/api/search-artist?artist=' + query);
 
-              case 5:
-                result = _context2.sent;
-
-                this.setState({
+              case 6:
+                result = _context3.sent;
+                _context3.next = 9;
+                return this.setState({
                   artists: result.data.artists.items
                 });
-                _context2.next = 13;
-                break;
 
               case 9:
-                _context2.prev = 9;
-                _context2.t0 = _context2['catch'](1);
+                _context3.next = 15;
+                break;
+
+              case 11:
+                _context3.prev = 11;
+                _context3.t0 = _context3['catch'](2);
 
                 console.log('problem finding artist');
-                console.error(_context2.t0);
+                console.error(_context3.t0);
 
-              case 13:
+              case 15:
               case 'end':
-                return _context2.stop();
+                return _context3.stop();
             }
           }
-        }, _callee2, this, [[1, 9]]);
+        }, _callee3, this, [[2, 11]]);
       }));
 
       function searchArtist() {
-        return _ref2.apply(this, arguments);
+        return _ref3.apply(this, arguments);
       }
 
       return searchArtist;
     }()
+  }, {
+    key: 'toggleAudio',
+    value: function toggleAudio() {
+      var audioSetting = this.state.audioEnabled;
+      this.setState({
+        audioEnabled: !audioSetting
+      });
+    }
   }]);
 
   return App;
@@ -499,7 +539,22 @@ var SelectedArtist = function (_React$Component) {
     return _this;
   }
 
+  //handle volume changes
+
+
   _createClass(SelectedArtist, [{
+    key: 'componentDidUpdate',
+    value: function componentDidUpdate(prevProps, prevState) {
+      if (prevProps.audioEnabled !== this.props.audioEnabled) {
+        var newVolume = void 0;
+        this.props.audioEnabled ? newVolume = 1 : newVolume = 0;
+        var oldAudio = this.state.audio;
+        oldAudio.volume = newVolume;
+        this.setState({ prevState: prevState, audio: oldAudio });
+        console.log('changing audio setting');
+      }
+    }
+  }, {
     key: 'componentDidMount',
     value: function () {
       var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
@@ -570,6 +625,9 @@ var SelectedArtist = function (_React$Component) {
 
       return componentWillUnmount;
     }()
+
+    //TODO add an audio off button
+
   }, {
     key: 'render',
     value: function render() {
@@ -799,33 +857,27 @@ var SelectedArtist = function (_React$Component) {
 
   }, {
     key: 'likeTrack',
-    value: function likeTrack() {
-      var prevSeedTracks = this.state.seedTracks;
-      prevSeedTracks.push(this.state.selectedTrack);
-      if (prevSeedTracks.length > 4) prevSeedTracks.shift(); //Remove oldest seed element
-      this.setState({
-        seedTracks: prevSeedTracks
-      });
-      this.findNewTracks();
-    }
-
-    //music
-
-  }, {
-    key: 'togglePlay',
     value: function () {
       var _ref7 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee7() {
+        var prevSeedTracks;
         return regeneratorRuntime.wrap(function _callee7$(_context7) {
           while (1) {
             switch (_context7.prev = _context7.next) {
               case 0:
-                _context7.next = 2;
-                return this.setState({ playing: !this.state.playing });
+                prevSeedTracks = this.state.seedTracks;
 
-              case 2:
-                this.state.playing ? this.state.audio.play() : this.state.audio.pause();
+                prevSeedTracks.push(this.state.selectedTrack);
+                if (prevSeedTracks.length > 4) prevSeedTracks.shift(); //Remove oldest seed element
+                _context7.next = 5;
+                return this.setState({
+                  seedTracks: prevSeedTracks
+                });
 
-              case 3:
+              case 5:
+                _context7.next = 7;
+                return this.findNewTracks();
+
+              case 7:
               case 'end':
                 return _context7.stop();
             }
@@ -833,14 +885,17 @@ var SelectedArtist = function (_React$Component) {
         }, _callee7, this);
       }));
 
-      function togglePlay() {
+      function likeTrack() {
         return _ref7.apply(this, arguments);
       }
 
-      return togglePlay;
+      return likeTrack;
     }()
+
+    //music
+
   }, {
-    key: 'play',
+    key: 'togglePlay',
     value: function () {
       var _ref8 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee8() {
         return regeneratorRuntime.wrap(function _callee8$(_context8) {
@@ -848,15 +903,12 @@ var SelectedArtist = function (_React$Component) {
             switch (_context8.prev = _context8.next) {
               case 0:
                 _context8.next = 2;
-                return this.setState({
-                  playing: true
-                });
+                return this.setState({ playing: !this.state.playing });
 
               case 2:
-                _context8.next = 4;
-                return this.state.audio.play();
+                this.state.playing ? this.state.audio.play() : this.state.audio.pause();
 
-              case 4:
+              case 3:
               case 'end':
                 return _context8.stop();
             }
@@ -864,8 +916,39 @@ var SelectedArtist = function (_React$Component) {
         }, _callee8, this);
       }));
 
-      function play() {
+      function togglePlay() {
         return _ref8.apply(this, arguments);
+      }
+
+      return togglePlay;
+    }()
+  }, {
+    key: 'play',
+    value: function () {
+      var _ref9 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee9() {
+        return regeneratorRuntime.wrap(function _callee9$(_context9) {
+          while (1) {
+            switch (_context9.prev = _context9.next) {
+              case 0:
+                _context9.next = 2;
+                return this.setState({
+                  playing: true
+                });
+
+              case 2:
+                _context9.next = 4;
+                return this.state.audio.play();
+
+              case 4:
+              case 'end':
+                return _context9.stop();
+            }
+          }
+        }, _callee9, this);
+      }));
+
+      function play() {
+        return _ref9.apply(this, arguments);
       }
 
       return play;

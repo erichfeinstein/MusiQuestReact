@@ -42,7 +42,7 @@ body {
 #header {
   display: flex;
   justify-content: center;
-  padding: 2em;
+  padding: 1em;
   font-size: 3em;
   color: white;
 }
@@ -69,8 +69,19 @@ button {
   transition: background-color, 0.15s;
   outline-style: none;
 }
+#toggle-audio-button {
+  display: flex;
+  margin-top: 2em;
+  margin-bottom: 2em;
+}
 #search-area button:hover {
   background-color: lightgrey;
+}
+.home {
+  display: flex;
+  align-content: center;
+  justify-content: center;
+  flex-direction: column;
 }
 
 #artist-list {
